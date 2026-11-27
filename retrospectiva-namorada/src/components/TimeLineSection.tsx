@@ -17,6 +17,11 @@ interface TimelineSectionProps {
   memories: Memory[];
 }
 
+interface ModalState {
+  memory: Memory | null;
+  startIndex: number;
+}
+
 function getMemoryPhotos(memory: Memory): string[] {
   if (memory.photos && memory.photos.length > 0) {
     return memory.photos;
@@ -25,7 +30,10 @@ function getMemoryPhotos(memory: Memory): string[] {
 }
 
 export function TimelineSection({ memories }: TimelineSectionProps) {
-  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [modalState, setModalState] = useState<ModalState>({
+    memory: null,
+    startIndex: 0,
+  });
   const [photoIndexes, setPhotoIndexes] = useState<Record<string, number>>({});
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
@@ -79,7 +87,8 @@ export function TimelineSection({ memories }: TimelineSectionProps) {
           const photos = getMemoryPhotos(memory);
           const hasMultiplePhotos = photos.length > 1;
           const currentIndex = photoIndexes[memory.id] ?? 0;
-          const safeIndex = currentIndex < photos.length ? currentIndex : 0;
+          const safeIndex =
+            photos.length > 0 ? Math.min(currentIndex, photos.length - 1) : 0;
           const activePhoto = photos[safeIndex] ?? memory.imageUrl;
           const photoKey = `${memory.id}-${safeIndex}`;
           const isImageMissing = failedImages[photoKey];
@@ -89,7 +98,12 @@ export function TimelineSection({ memories }: TimelineSectionProps) {
               <span className="absolute -left-[7px] top-2 w-3.5 h-3.5 rounded-full bg-rose-500 ring-4 ring-zinc-950" />
 
               <div
-                onClick={() => setSelectedMemory(memory)}
+                onClick={() =>
+                  setModalState({
+                    memory,
+                    startIndex: safeIndex,
+                  })
+                }
                 className="group cursor-pointer bg-zinc-900/70 hover:bg-zinc-900 border border-zinc-800/90 hover:border-rose-500/40 rounded-3xl overflow-hidden transition-all duration-300 shadow-lg grid grid-cols-1 md:grid-cols-12"
               >
                 <div className="md:col-span-5 relative aspect-[4/3] md:aspect-auto bg-zinc-950 overflow-hidden flex items-center justify-center">
@@ -98,8 +112,8 @@ export function TimelineSection({ memories }: TimelineSectionProps) {
                       <Image
                         src={activePhoto}
                         alt={`${memory.title} - foto ${safeIndex + 1}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 42vw"
+                        width={1200}
+                        height={900}
                         onError={() => handleImageError(photoKey)}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -196,8 +210,9 @@ export function TimelineSection({ memories }: TimelineSectionProps) {
       </div>
 
       <PhotoModal
-        memory={selectedMemory}
-        onClose={() => setSelectedMemory(null)}
+        memory={modalState.memory}
+        initialIndex={modalState.startIndex}
+        onClose={() => setModalState({ memory: null, startIndex: 0 })}
       />
     </section>
   );
