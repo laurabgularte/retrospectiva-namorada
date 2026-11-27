@@ -6,6 +6,7 @@ export interface Memory {
   location?: string;
   description: string;
   imageUrl: string; // Caminho dentro de public/ (ex: "/photos/foto1.jpg")
+  photos?: string[]; // Caminhos dentro de public/ (ex: ["/photos/foto1.jpg", "/photos/foto2.jpg"])
   tag?: string;
 }
 
