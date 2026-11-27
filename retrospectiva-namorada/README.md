@@ -1,1 +1,1 @@
- **Retrospectiva de 2026 feita para a minha namorada**
+ **Retrospectiva de 2026**
