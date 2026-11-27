@@ -57,8 +57,8 @@ export const MEMORIES: Memory[] = [
   },
   {
     id: "mem-2",
-    date: "2025-09-20",
-    displayDate: "20 de Setembro de 2025",
+    date: "2025-08-16",
+    displayDate: "16 de Agosto de 2025",
     title: "Um Dia Inesquecível",
     location: "Onde estávamos",
     description:
@@ -75,6 +75,7 @@ export const MEMORIES: Memory[] = [
     description:
       "Lembrança da nossa aventura, das fotos espontâneas e de tudo que planejamos juntas.",
     imageUrl: "/photos/foto-3.jpg", //public/photos/foto-3.jpg
+    photos: ["/photos/foto-3a.jpg", "/photos/foto-3b.jpg"],
     tag: "Viagem",
   },
   {
