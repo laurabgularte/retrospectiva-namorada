@@ -1,29 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { calculateTimeTogether, TimeElapsed } from "@/lib/dateUtils";
+import { useSyncExternalStore } from "react";
+import { calculateTimeTogether } from "@/lib/dateUtils";
 import { RELATIONSHIP_START_DATE } from "@/data/memories";
 
+function subscribe(callback: () => void) {
+  const timer = setInterval(callback, 1000);
+  return () => clearInterval(timer);
+}
+
+function getSnapshot() {
+  return Math.floor(Date.now() / 1000);
+}
+
+function getServerSnapshot() {
+  return null;
+}
+
 export function LoveCounter() {
-  const [elapsed, setElapsed] = useState<TimeElapsed>(() =>
-    calculateTimeTogether(RELATIONSHIP_START_DATE),
+  const currentSecond = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
   );
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsed(calculateTimeTogether(RELATIONSHIP_START_DATE));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const elapsed =
+    currentSecond !== null
+      ? calculateTimeTogether(RELATIONSHIP_START_DATE)
+      : null;
 
   const items = [
-    { label: "Anos", value: elapsed.years },
-    { label: "Meses", value: elapsed.months },
-    { label: "Dias", value: elapsed.days },
-    { label: "Horas", value: elapsed.hours },
-    { label: "Minutos", value: elapsed.minutes },
-    { label: "Segundos", value: elapsed.seconds },
+    { label: "Anos", value: elapsed ? elapsed.years : null },
+    { label: "Meses", value: elapsed ? elapsed.months : null },
+    { label: "Dias", value: elapsed ? elapsed.days : null },
+    { label: "Horas", value: elapsed ? elapsed.hours : null },
+    { label: "Minutos", value: elapsed ? elapsed.minutes : null },
+    { label: "Segundos", value: elapsed ? elapsed.seconds : null },
   ];
 
   return (
@@ -34,7 +46,7 @@ export function LoveCounter() {
           className="bg-zinc-900/80 backdrop-blur-md border border-zinc-800/80 rounded-2xl p-4 text-center shadow-lg transition-transform duration-300 hover:-translate-y-1"
         >
           <div className="text-2xl sm:text-4xl font-bold text-rose-400 tabular-nums">
-            {String(item.value).padStart(2, "0")}
+            {item.value !== null ? String(item.value).padStart(2, "0") : "--"}
           </div>
           <div className="text-[11px] sm:text-xs uppercase tracking-wider text-zinc-400 mt-1">
             {item.label}
