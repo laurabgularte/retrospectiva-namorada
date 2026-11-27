@@ -7,32 +7,60 @@ import { Memory } from "@/types/memory";
 
 interface PhotoModalProps {
   memory: Memory | null;
+  initialIndex?: number;
   onClose: () => void;
 }
 
-export function PhotoModal({ memory, onClose }: PhotoModalProps) {
-  const [selection, setSelection] = useState({ memory, index: 0 });
-  const currentIndex = selection.memory === memory ? selection.index : 0;
-
-  const setCurrentIndex = useCallback(
-    (update: number | ((previous: number) => number)) => {
-      setSelection((previous) => {
-        const previousIndex = previous.memory === memory ? previous.index : 0;
-        return {
-          memory,
-          index: typeof update === "function" ? update(previousIndex) : update,
-        };
-      });
-    },
-    [memory],
-  );
-
+export function PhotoModal({
+  memory,
+  initialIndex = 0,
+  onClose,
+}: PhotoModalProps) {
   const gallery =
     memory?.photos && memory.photos.length > 0
       ? memory.photos
-      : memory
+      : memory?.imageUrl
         ? [memory.imageUrl]
         : [];
+
+  const safeStart =
+    gallery.length > 0
+      ? Math.max(0, Math.min(initialIndex, gallery.length - 1))
+      : 0;
+  const [indexState, setIndexState] = useState({
+    memory,
+    initialIndex,
+    galleryLength: gallery.length,
+    index: safeStart,
+  });
+  const isCurrentSelection =
+    indexState.memory === memory &&
+    indexState.initialIndex === initialIndex &&
+    indexState.galleryLength === gallery.length;
+  const currentIndex = isCurrentSelection
+    ? Math.max(0, Math.min(indexState.index, Math.max(0, gallery.length - 1)))
+    : safeStart;
+  const setCurrentIndex = useCallback((
+    nextIndex: number | ((previousIndex: number) => number),
+  ) => {
+    setIndexState((previousState) => {
+      const previousIndex =
+        previousState.memory === memory &&
+        previousState.initialIndex === initialIndex &&
+        previousState.galleryLength === gallery.length
+          ? previousState.index
+          : currentIndex;
+      return {
+        memory,
+        initialIndex,
+        galleryLength: gallery.length,
+        index:
+          typeof nextIndex === "function"
+            ? nextIndex(previousIndex)
+            : nextIndex,
+      };
+    });
+  }, [memory, initialIndex, gallery.length, currentIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -55,9 +83,9 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
     };
   }, [memory, onClose, gallery.length, setCurrentIndex]);
 
-  if (!memory) return null;
+  if (!memory || gallery.length === 0) return null;
 
-  const activePhoto = gallery[currentIndex] ?? memory.imageUrl;
+  const activePhoto = gallery[currentIndex] ?? gallery[0];
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
@@ -77,6 +105,7 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
         className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl"
       >
         <button
+          type="button"
           onClick={onClose}
           aria-label="Fechar"
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 text-zinc-200 hover:bg-black hover:text-white transition"
@@ -97,16 +126,18 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
           {gallery.length > 1 && (
             <>
               <button
+                type="button"
                 onClick={handlePrev}
                 aria-label="Foto anterior"
-                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/65 text-white hover:bg-black transition"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/65 text-white hover:bg-black transition"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
+                type="button"
                 onClick={handleNext}
                 aria-label="Próxima foto"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/65 text-white hover:bg-black transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/65 text-white hover:bg-black transition"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -118,10 +149,11 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
           <div className="flex items-center justify-center gap-2 px-6 pt-4">
             {gallery.map((photo, idx) => (
               <button
+                type="button"
                 key={`${photo}-${idx}`}
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`Ver foto ${idx + 1}`}
-                className={`relative w-12 h-12 rounded-lg overflow-hidden border transition ${
+                className={`w-12 h-12 rounded-lg overflow-hidden border transition ${
                   idx === currentIndex
                     ? "border-rose-400 scale-105"
                     : "border-zinc-800 opacity-60 hover:opacity-100"
@@ -130,9 +162,9 @@ export function PhotoModal({ memory, onClose }: PhotoModalProps) {
                 <Image
                   src={photo}
                   alt={`Miniatura ${idx + 1}`}
-                  fill
-                  sizes="48px"
-                  className="object-cover"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
                 />
               </button>
             ))}
