@@ -69,9 +69,9 @@ export const MEMORIES: Memory[] = [
   {
     id: "mem-3",
     date: "2025-12-19",
-    displayDate: "19 de Dezembro de 2025",
+    displayDate: "19 e 20 de Dezembro de 2025",
     title: "Nossa Viagem Juntas",
-    location: "Destino da viagem",
+    location: "Foz do Iguaçu/Paraguai",
     description:
       "Lembrança da nossa aventura, das fotos espontâneas e de tudo que planejamos juntas.",
     imageUrl: "/photos/foto-3.jpg", //public/photos/foto-3.jpg
@@ -80,9 +80,9 @@ export const MEMORIES: Memory[] = [
   {
     id: "mem-4",
     date: "2026-11-26",
-    displayDate: "26 de Novembro de 2026",
+    displayDate: "11 de Novembro de 2026",
     title: "Noite Especial",
-    location: "Jantar / Passeio",
+    location: "Jantar",
     description:
       "Porque celebrar a gente nunca precisa de motivo, mas esse dia mereceu registro.",
     imageUrl: "/photos/foto-4.jpg", // public/photos/foto-4.jpg
