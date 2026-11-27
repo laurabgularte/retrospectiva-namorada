@@ -8,7 +8,7 @@ export const COUPLE_INFO = {
   heroTitle: "Nossa Retrospectiva",
   heroSubtitle:
     "Cada momento, cada risada e cada capítulo que construímos juntas até aqui.",
-  musicPath: "/music/nossa-musica.mp3",
+  spotifyUrl: "https://open.spotify.com/intl-pt/track/0P5Vg3FLAaJtxBeNEJxLSM",
   musicTitle: "Nossa Música",
 };
 
