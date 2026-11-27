@@ -48,8 +48,8 @@ export const MEMORIES: Memory[] = [
     id: "mem-1",
     date: "2025-05-10",
     displayDate: "10 de Maio de 2025",
-    title: "O Nosso Primeiro Encontro",
-    location: "Nosso lugar faaaavorito",
+    title: "Primeiros Encontros",
+    location: "Mateando na praça",
     description:
       "Amei ficar rindo de bobeiras com você, nos entendemos desde o primeiro momento.",
     imageUrl: "/photos/foto-1.jpg", // public/photos/foto-1.jpg
